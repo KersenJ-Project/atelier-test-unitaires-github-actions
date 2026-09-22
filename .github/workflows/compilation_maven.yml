@@ -25,5 +25,5 @@ jobs:
                 java-version: "25"
             - name: Fournir accès au runner
               run: chmod +x mvnw
-            - name: Compilation du projet Maven
-              run: ./mvnw compile
+            - name: Compilation et test du projet du projet Maven
+              run: ./mvnw test
