@@ -1,0 +1,23 @@
+# Nom du workflow, doit être descriptif
+name: Compilation du projet Maven
+
+# Éxécutions seulement quand on push le code sur la branche main
+on:
+    push:
+        branches:
+            - main
+
+# Définition de ce qu'on doit faire, se fait sur la machine virtuelle choisi
+jobs:
+    compilation:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v5
+            - name: Set up JDK 21
+              uses: actions/setup-java@v5
+              with:
+                distribution: "temurin"
+                java-version: "25"
+            - name: Compilation du projet Maven
+              run: ./mvnw compile
