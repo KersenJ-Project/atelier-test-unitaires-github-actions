@@ -142,7 +142,7 @@ class CalculatriceTest {
         // Vérifiez que estPremier(nombre) correspond bien à la valeur "attendu".
         boolean resultat = calculatrice.estPremier(nombre);
 
-        assertEquals(attendu, nombre);;
+        assertEquals(attendu, resultat);;
     }
 
     @Test
