@@ -22,8 +22,13 @@ jobs:
               uses: actions/setup-java@v5
               with:
                 distribution: "temurin"
-                java-version: "25"
+                java-version: "21"
             - name: Fournir accès au runner
               run: chmod +x mvnw
             - name: Compilation et test du projet du projet Maven
               run: ./mvnw test
+            - name: Publier le rapport de tests
+              uses: actions/upload-artifact@v5
+              with:
+                name: rapport-surefire
+                path: target/surefire-reports/
