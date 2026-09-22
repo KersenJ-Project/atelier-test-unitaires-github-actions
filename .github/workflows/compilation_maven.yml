@@ -6,6 +6,10 @@ on:
     push:
         branches:
             - main
+    pull_request:
+        branches: 
+            - main
+    workflow_dispatch:
 
 # Définition de ce qu'on doit faire, se fait sur la machine virtuelle choisi
 jobs:
