@@ -1,47 +1,45 @@
-#Nom du projet, peut être n'importe quoi, mais qui décrit bien ce que fait le workflow
 name: Compilation du projet Maven
 
-#S'exécute seulement quand on pousse du code sur la branche main
 on:
   push:
     tags:
       - '*.*.*'
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
-  
 
-#Ma définition de job qui va s'éxécuter sur la machine virtuelle ubuntu-latest, et qui va exécuter les étapes suivantes
 jobs:
-    compilation:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout repository
-            uses: actions/checkout@v5
-          - name: Set up JDK 25
-            uses: actions/setup-java@v5
-            with:
-              distribution: 'temurin'
-              java-version: '25'
-          - name : Fournir access au runner
-            run: chmod +x mvnw
-          - name: Compilation du projet Maven
-            run: ./mvnw package -DskipTests
-          - name: Créer un release GitHub
-            uses: softprops/action-gh-release@v3
-            with:
-              files: target/*.jar
+  compilation:
+    runs-on: ubuntu-latest
 
-# implémenter les 17 tests qui échouent actuellement
-# modifier la dernière étape pour aussi exécuter les tests après la compilation
+    strategy:
+      matrix:
+        java-version: [21, 25]
 
-#Ajouter Jacoco dans votre projet pour être en mesure de voir 
-#le rapport de couverture de test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-# Utiliser un artefact pour stocker le rapport de couverture de test 
-# et le rendre disponible pour téléchargement après l'exécution du workflow
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java-version }}
+          cache: maven
 
-#Empaqueter le projet Maven en un fichier JAR exécutable 
-#et le stocker comme artefact pour téléchargement après l'exécution du workflow
-          
-  
+      - name: Donner les permissions au Maven Wrapper
+        run: chmod +x mvnw
+
+      - name: Compiler et exécuter les tests
+        run: ./mvnw -B clean verify
+
+      - name: Stocker le JAR comme artefact
+        if: matrix.java-version == 25
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculatrice-jar
+          path: target/atelier-tests-unitaires.jar
+          retention-days: 7

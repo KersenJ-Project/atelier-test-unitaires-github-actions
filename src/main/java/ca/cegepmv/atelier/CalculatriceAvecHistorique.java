@@ -1,5 +1,7 @@
 package ca.cegepmv.atelier;
 
+import java.util.Objects;
+
 /**
  * Variante de la calculatrice qui dépend d'un {@link Journal} pour enregistrer chaque
  * opération effectuée. Cette dépendance est injectée par constructeur — c'est ce qui
@@ -11,7 +13,7 @@ public class CalculatriceAvecHistorique {
     private final Journal journal;
 
     public CalculatriceAvecHistorique(Journal journal) {
-        this.journal = journal;
+        this.journal = Objects.requireNonNull(journal, "Le journal ne peut pas être null");
     }
 
     /**

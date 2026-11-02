@@ -1,0 +1,11 @@
+# Fichiers Git
+.git/
+
+# Configuration des IDE
+.idea/
+.vscode/
+*.iml
+
+# Fichiers Maven générés : tout exclure sauf les JAR
+target/*
+!target/*.jar
