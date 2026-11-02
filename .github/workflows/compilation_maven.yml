@@ -11,6 +11,10 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   compilation:
     runs-on: ubuntu-latest
@@ -43,3 +47,40 @@ jobs:
           name: calculatrice-jar
           path: target/atelier-tests-unitaires.jar
           retention-days: 7
+  
+  publication-docker:
+    needs: compilation
+    runs-on: ubuntu-latest
+
+    if: github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Telecharger le JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: calculatrice-jar
+          path: target/
+
+      - name: Definir le nom du proprietaire
+        run: echo "OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_ENV"
+
+      # Authentification auprès de GHCR
+      - name: Connexion à GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Construire et publier l'image
+      - name: Construire et publier l'image Docker
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ env.OWNER_LC }}/calculatrice:latest
+            ghcr.io/${{ env.OWNER_LC }}/calculatrice:${{ github.sha }}
